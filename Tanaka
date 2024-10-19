@@ -1,0 +1,58 @@
+import pandas as pd
+
+# Define parameter ranges
+parameter_ranges = {
+    "Throughput (tonnes/day)": (120, float('inf')),
+    "Feed Grade (g/t)": (0.5, float('inf')),
+    "Stoppage Time (hours)": (0, 3),
+    "Grind Size Passing 75 Microns (%)": (70, 90),
+    "Grind Size Passing 106 Microns (%)": (75, 95),
+    "Mill Feed Density (% solids)": (50, 70),
+    "Mill Discharge Density (% solids)": (50, 65),
+    "Leach Tank Density (% solids)": (40, 50),
+    "Leach Tank pH": (10, 12),
+    "Cyanide Strength": (0.05, 0.15)  # Example values
+}
+import streamlit as st
+
+# Title of the app
+st.title("Gold Processing Plant Simulation")
+
+# Input fields for parameters
+throughput = st.number_input("Throughput (tonnes/day)", min_value=0.0)
+feed_grade = st.number_input("Feed Grade (g/t)", min_value=0.0)
+stoppage_time = st.number_input("Stoppage Time (hours)", min_value=0.0)
+grind_size_75 = st.number_input("Grind Size Passing 75 Microns (%)", min_value=0, max_value=100)
+grind_size_106 = st.number_input("Grind Size Passing 106 Microns (%)", min_value=0, max_value=100)
+mill_feed_density = st.number_input("Mill Feed Density (% solids)", min_value=0, max_value=100)
+def check_parameters():
+    feedback = []
+    if throughput < parameter_ranges["Throughput (tonnes/day)"][0]:
+        feedback.append("Increase throughput.")
+    if feed_grade < parameter_ranges["Feed Grade (g/t)"][0]:
+        feedback.append("Increase feed grade.")
+    if stoppage_time > parameter_ranges["Stoppage Time (hours)"][1]:
+        feedback.append("Reduce stoppage time.")
+    if grind_size_75 < parameter_ranges["Grind Size Passing 75 Microns (%)"][0] or grind_size_75 > parameter_ranges["Grind Size Passing 75 Microns (%)"][1]:
+        feedback.append("Adjust grind size passing 75 microns.")
+    if grind_size_106 < parameter_ranges["Grind Size Passing 106 Microns (%)"][0] or grind_size_106 > parameter_ranges["Grind Size Passing 106 Microns (%)"][1]:
+        feedback.append("Adjust grind size passing 106 microns.")
+    if mill_feed_density < parameter_ranges["Mill Feed Density (% solids)"][0] or mill_feed_density > parameter_ranges["Mill Feed Density (% solids)"][1]:
+        feedback.append("Adjust mill feed density.")
+
+    return feedback
+# Button to check parameters
+if st.button("Check Parameters"):
+    results = check_parameters()
+    if results:
+        st.write("Feedback:")
+        for item in results:
+            st.write(f"- {item}")
+    else:
+        st.write("All parameters are within the acceptable range!")
+import csv
+
+# Save input data to CSV
+with open('input_data.csv', mode='a', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow([throughput, feed_grade, stoppage_time, grind_size_75, grind_size_106, mill_feed_density])
